@@ -1,0 +1,94 @@
+
+<div class="col-sm-4">
+    <div class="widget">
+        <fieldset>
+            <legend>Scripts</legend>
+            <ul class="sortable list-group" id="scripts">
+                {{#each files}}
+                     <li class="ui-state-default list-group-item clearfix" data-id="{{id}}">
+                         <span class="lead">
+                             {{name}}
+                         </span>
+                         <span class="pull-right">
+                             <label for="{{id}}">
+                                 <span class="glyphicon glyphicon-ok"></span>
+                             </label>
+                             <input type="checkbox" class="scriptActive" name="{{id}}" id="{{id}}" {{#if active}}checked{{/if}}>
+                         </span>
+                     </li>
+                {{/each}}
+            </ul>
+        </fieldset>
+    </div>
+</div>
+
+
+
+<script>
+    $('#scripts').on("sortstart", function(event, ui) {
+        ui.item.startIndex = ui.item.index();
+    });
+    $('#scripts').on("sortupdate", function(event, ui) {
+        socket.emit('MoveScript', { script: ui.item.data('id'), index: ui.item.index() }, function(success) {
+            if(success != true) {
+                $('#scripts').sortable("cancel");
+            }
+        });
+    });
+    $('#scripts').on("click", ".scriptActive", function(event) {
+        socket.emit('SetScriptActive', { script: this.id, active: this.checked }, function(success) {
+            if(success) {
+                $(this).prop('checked', 'true');
+                $(this).change();
+            } else {
+                $(this).prop('checked', !$(this).prop('checked'));
+                $(this).change();
+            }
+        });
+
+    });
+    socket.on('ScriptAdded', function(data) {
+        var html = '<li class="ui-state-default list-group-item clearfix" data-id="' + data.id + '">\
+            <span class="lead">'
+                + data.name +
+            '</span>\
+            <span class="pull-right">\
+                <label for="' + data.id + '">\
+                    <span class="glyphicon glyphicon-ok"></span>\
+                </label>\
+                <input type="checkbox" class="scriptActive" name="' + data.id + '" id="' + data.id + '">\
+            </span>\
+        </li>';
+        $('#scripts').append(html);
+        $("input").checkboxradio({
+            icon: false
+        });
+        $(".sortable").sortable();
+        $(".sortable").disableSelection();
+    });
+    socket.on('ScriptChanged', function(data) {
+        $('#scripts li').each(function() {
+            if($(this).data('id') == data.id) {
+                console.log(data.name);
+                $(this).find('.lead').html(data.name);
+                $(this).effect("highlight", 4000);
+            }
+        });
+    });
+    socket.on('ScriptRemoved', function(data) {
+        $("[data-id='"+data.id+"']").remove();
+        //$('#scripts').remove("[data-id='"+data.id+"']");
+    });
+    socket.on('disconnect', function(data) {
+        console.log('disconnected');
+        $('#scripts').sortable({disabled: true});
+        $('.scriptActive').prop('disabled', true);
+    });
+    $(function() {
+        $("input").checkboxradio({
+            icon: false
+        });
+        $(".sortable").sortable();
+        $(".sortable").disableSelection();
+    });
+</script>

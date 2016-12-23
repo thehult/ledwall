@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>LedWall</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" >
+    <link rel="stylesheet" href="/css/jquery-ui.min.css" >
+    <link rel="stylesheet" href="/css/jquery-ui.theme.min.css" >
+    <link rel="stylesheet" href="/css/layout.css" >
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <script src='/socket.io/socket.io.js'></script>
+    <script>
+    
+
+    var socket = io();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="alert alert-danger " id="alert-danger">
+            <strong>CONNECTION LOST!</strong>
+        </div>
+        <script>
+            $("#alert-danger").hide();
+            socket.on('disconnect', function(data) {
+                $("#alert-danger").show();
+            });
+        </script>
+        {{{body}}}
+    </div>
+</body>
+</html>

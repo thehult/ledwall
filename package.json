@@ -1,0 +1,17 @@
+{
+  "name": "ledwall",
+  "version": "0.1.0",
+  "description": "The full suit of tools to run a LedWall by TheHult.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TheHult",
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^1.6.1",
+    "express": "^4.14.0",
+    "express-handlebars": "^3.0.0",
+    "socket.io": "^1.5.0"
+  }
+}
