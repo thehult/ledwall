@@ -187,7 +187,7 @@ server.listen(cfg.port, function() {
     console.log('Server started on port ' + cfg.port);
 });
 
-var tickTimer = setInterval(function() {
+app.tickTimer = setInterval(function() {
     wall.tick();
     try {
         scripts.tick();
@@ -197,3 +197,5 @@ var tickTimer = setInterval(function() {
     var imgData = wall.ctx.getImageData(0, 0, wall.width, wall.height);
     io.emit("ImageData", {data: imgData.data, length: imgData.data.length });
 }, 1000.0 / cfg.updatesPerSecond);
+
+module.exports = app;

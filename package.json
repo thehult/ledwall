@@ -1,14 +1,20 @@
 {
   "name": "ledwall",
   "version": "0.1.0",
+  "auto-updater": {
+      "repo": "/thehult/ledwall",
+      "branch": "master"
+  },
   "description": "The full suit of tools to run a LedWall by TheHult.",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "TheHult",
   "license": "ISC",
   "dependencies": {
+    "auto-updater": "^1.0.2",
     "body-parser": "^1.15.2",
     "brfs": "^1.4.3",
     "canvas": "^1.6.2",
