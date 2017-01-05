@@ -3,7 +3,7 @@ var AutoUpdater = require('auto-updater');
 var autoupdater = new AutoUpdater({
     pathToJson: '',
     autoupdate: false,
-    checkgit: true,
+    checkgit: false,
     jsonhost: 'raw.githubusercontent.com',
     contenthost: 'codeload.github.com',
     progressDebounce: 0,
@@ -14,6 +14,7 @@ autoupdater.finished = false;
 
 autoupdater.on('git-clone', function() {
   console.log("You have a clone of the repository. Use 'git pull' to be up-to-date");
+  autoupdater.finished = true;
 });
 autoupdater.on('check.up-to-date', function(v) {
   console.info("You have the latest version: " + v);

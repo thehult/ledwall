@@ -2,7 +2,7 @@
   "name": "ledwall",
   "version": "0.1.0",
   "auto-updater": {
-      "repo": "/thehult/ledwall",
+      "repo": "thehult/ledwall",
       "branch": "master"
   },
   "description": "The full suit of tools to run a LedWall by TheHult.",
