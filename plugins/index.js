@@ -1,3 +1,5 @@
+
+
 module.exports = function(wall, app) {
     var plugins = {};
 
@@ -5,12 +7,13 @@ module.exports = function(wall, app) {
     var fs = require('fs');
     var path = require('path');
 
-    var _pluginnames = require('fs').readdirSync(__dirname).filter(function(file) {
+    var _pluginnames = fs.readdirSync(__dirname).filter(function(file) {
         return fs.statSync(path.join(__dirname, file)).isDirectory();
     });
 
     _pluginnames.forEach(function(plugin) {
-        plugins[plugin] = require(path.join(__dirname, plugin))(wall, app);
+        //plugins[plugin] = require(path.join(__dirname, plugin))(wall, app);
+        global[plugin] = require(path.join(__dirname, plugin))(wall, app);
     });
 
     return plugins;

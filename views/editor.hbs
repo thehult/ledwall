@@ -1,0 +1,105 @@
+<form method="post" action="/edit">
+    <div class="row">
+        <div class="col-sm-4">
+            <legend>Name</legend>
+            <div class="form-group">
+                {{#if edit}}
+                    <input type="hidden" name="name" value="{{name}}"/>
+                    <input type="text" class="form-control" value="{{name}}" disabled="true"/>
+                {{else}}
+                    <input type="text" class="form-control" name="name" value="{{name}}"/>
+                {{/if}}
+            </div>
+        </div>
+
+        <div class="col-sm-8">
+            <legend>Parameters</legend>
+            <div id="parameters">
+                {{#each parameters}}
+                    <div class="row parameter-row">
+                        <div class="col-xs-5">
+                            <input type="text" class="form-control" name="parameter[]" placeholder="Name" value="{{name}}">
+                        </div>
+                        <div class="col-xs-5">
+                            <input type="text" class="form-control" name="parametervalue[]" placeholder="Default value" value="{{value}}">
+                        </div>
+                        <div class="col-xs-2">
+                            <button type="button" class="btn btn-danger pull-right removeParameter"><span class="glyphicon glyphicon-minus"></span></button>
+                        </div>
+                    </div>
+                {{/each}}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button type="button" class="btn btn-success pull-right" id="addParameter"><span class="glyphicon glyphicon-plus"></span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <legend>Start code</legend>
+            <textarea class="form-control" name="startcode" id="startcode" rows="8">{{startcode}}</textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <legend>Tick code</legend>
+            <textarea class="form-control" name="tickcode" id="tickcode" rows="8">{{tickcode}}</textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <legend>Stop code</legend>
+            <textarea class="form-control" name="stopcode" id="stopcode" rows="8">{{stopcode}}</textarea>
+        </div>
+    </div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <button class="btn btn-success pull-right">Save</button>
+    </div>
+</div>
+
+</form>
+
+<script>
+    var ind = 0;
+    $("#addParameter").click(function() {
+        var html = '<div class="row parameter-row">\
+            <div class="col-xs-5">\
+                <input type="text" class="form-control" name="parameter[]" placeholder="Name">\
+            </div>\
+            <div class="col-xs-5">\
+                <input type="text" class="form-control" name="parametervalue[]" placeholder="Default value">\
+            </div>\
+            <div class="col-xs-2">\
+                <button type="button" class="btn btn-danger pull-right removeParameter"><span class="glyphicon glyphicon-minus"></span></button>\
+            </div>\
+        </div>';
+        ind++;
+        $(this).parent().parent().before(html);
+    });
+    $("#parameters").on("click", ".removeParameter", function() {
+        $(this).parent().parent().remove();
+    });
+
+    $(function() {
+        CodeMirror.fromTextArea(document.getElementById("startcode"));
+        CodeMirror.fromTextArea(document.getElementById("tickcode"));
+        CodeMirror.fromTextArea(document.getElementById("stopcode"));
+    });
+
+</script>
+<style>
+    .parameter-row {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        border-bottom: 1px #f0f0f0 solid;
+    }
+    .row {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+</style>

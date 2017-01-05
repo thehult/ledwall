@@ -2,5 +2,11 @@
     "port": 3000,
     "pin": 5555,
     "users": {},
-    "updatesPerSecond": 24
+    "updatesPerSecond": 24,
+    "wall": {
+        "boards":   [ [0,0,16,16],
+                    [16,0,16,16],
+                    [32,0,16,16],
+                    [48,0,16,16]]
+            }
 }

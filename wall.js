@@ -1,21 +1,13 @@
-module.exports = function() {
+
+module.exports = function(board_cfg) {
+    var Canvas = require('canvas');
     var Wall = {};
 
-    Wall.config = {
-        boards: [   [0,0,16,16],
-                    [16,0,16,16],
-                    [32,0,16,16],
-                    [48,0,16,16]]
-    };
+    Wall.config = board_cfg;
 
     Wall.width = 0;
     Wall.height = 0;
-    Wall.wall = [];
     Wall.listeners = [];
-
-    Wall.drawPixel = function(x, y, color) {
-        Wall.wall[x][y] = color;
-    };
 
     Wall.registerListener = function(func) {
             Wall.listeners.push(func);
@@ -59,13 +51,13 @@ module.exports = function() {
                 Wall.height = board[1] + board[3];
             }
         });
-        Wall.wall = [];
-        for(var x = 0; x < Wall.width; x++) {
-            Wall.wall.push([]);
-            for(var y = 0; y < Wall.height; y++) {
-                Wall.wall[x].push({r: 0, g: 0, b: 0});
-            }
-        }
+
+        Wall.Image = Canvas.Image;
+        Wall.canvas = new Canvas(Wall.width, Wall.height);
+        Wall.ctx = Wall.canvas.getContext('2d');
+        Wall.ctx.fillStyle = "black";
+        Wall.ctx.fillRect(0, 0, Wall.width, Wall.height);
+
         Wall.public.width = Wall.width;
         Wall.public.height = Wall.height;
     };
@@ -73,6 +65,9 @@ module.exports = function() {
     Wall.updateWallBounds();
 
 
+    Wall.getDataURL = function() {
+        return Wall.canvas.toDataURL();
+    }
 
     return Wall;
 }

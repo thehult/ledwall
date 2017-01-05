@@ -1,19 +1,53 @@
+<div id="optionsModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
-<div class="col-sm-4">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4>Parameters</h4>
+            </div>
+            <div class="modal-body" id="optionsBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" id="optionsSave">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="col-sm-6">
+    <div class="widget">
+        <fieldset>
+            <legend>Activated</legend>
+            <ul class="sortable list-group" id="activated">
+                {{#each activated}}
+                     <li class="ui-state-default list-group-item clearfix" data-id="{{id}}" data-index="{{@index}}">
+                         <span class="lead">
+                             {{id}}
+                         </span>
+                         <button class="btn btn-danger scriptDeactivate pull-right"><span class="glyphicon glyphicon-minus"></span></button>
+                         <button class="btn btn-link scriptOptions pull-right"><span class="glyphicon glyphicon-cog"></span></button>
+                     </li>
+                {{/each}}
+            </ul>
+        </fieldset>
+    </div>
+</div>
+
+<div class="col-sm-6">
     <div class="widget">
         <fieldset>
             <legend>Scripts</legend>
-            <ul class="sortable list-group" id="scripts">
-                {{#each files}}
-                     <li class="ui-state-default list-group-item clearfix" data-id="{{id}}">
+            <ul class="list-group" id="scripts">
+                {{#each scripts}}
+                     <li class="list-group-item clearfix" data-id="{{@key}}">
+                         <button class="btn btn-success scriptActivate pull-right" data-id="{{@key}}"><span class="glyphicon glyphicon-plus"></span></button>
                          <span class="lead">
-                             {{name}}
-                         </span>
-                         <span class="pull-right">
-                             <label for="{{id}}">
-                                 <span class="glyphicon glyphicon-ok"></span>
-                             </label>
-                             <input type="checkbox" class="scriptActive" name="{{id}}" id="{{id}}" {{#if active}}checked{{/if}}>
+                             {{@key}}
                          </span>
                      </li>
                 {{/each}}
@@ -23,71 +57,102 @@
 </div>
 
 
-
 <script>
-    $('#scripts').on("sortstart", function(event, ui) {
+
+
+    $('#activated').on("sortstart", function(event, ui) {
         ui.item.startIndex = ui.item.index();
     });
-    $('#scripts').on("sortupdate", function(event, ui) {
-        socket.emit('MoveScript', { script: ui.item.data('id'), index: ui.item.index() }, function(success) {
-            if(success != true) {
-                $('#scripts').sortable("cancel");
+    $('#activated').on("sortupdate", function(event, ui) {
+        ui.item.parent().children().each(function(ind) {
+            $(this).data("index", ind);
+        });
+        socket.emit('ScriptMove', { oldIndex: ui.item.startIndex, newIndex: ui.item.index() });
+    });
+    $('#activated').on("click", ".scriptDeactivate", function(event) {
+        console.log("Deactivating: " + $(this).parent().data("index"));
+
+        var _index = $(this).parent().data("index");
+        socket.emit('ScriptDeactivate', { index: _index });
+
+        $(this).parent().nextAll().each(function(ind) {
+            $(this).data("index", _index);
+            _index++;
+        });
+        $(this).parent().remove();
+    });
+    $('#activated').on("click", ".scriptOptions", function() {
+        $("#optionsBody").data("index", $(this).parent().data("index"));
+        socket.emit("ScriptParameters", { index: $(this).parent().data("index")}, function(msg) {
+            msg = JSON.parse(msg);
+            for(k in msg) {
+                $("#optionsBody").append('\
+                    <div class="row">\
+                        <div class="col-xs-3 text-right">\
+                            <strong>' + k + '</strong>\
+                        </div>\
+                        <div class="col-xs-9">\
+                            <input type="text" data-name="' + k + '" value="' + msg[k] + '" class="form-control">\
+                        </div>\
+                    </div>\
+                ');
             }
+            $("#optionsModal").modal();
         });
     });
-    $('#scripts').on("click", ".scriptActive", function(event) {
-        socket.emit('SetScriptActive', { script: this.id, active: this.checked }, function(success) {
-            if(success) {
-                $(this).prop('checked', 'true');
-                $(this).change();
-            } else {
-                $(this).prop('checked', !$(this).prop('checked'));
-                $(this).change();
-            }
+    $('#scripts').on("click", ".scriptActivate", function(event) {
+        var id = $(this).data("id");
+        var as = $("#activated li");
+        socket.emit('ScriptActivate', { id: id });
+        var html = '<li class="ui-state-default list-group-item clearfix" data-id="'+id+'" data-index="'+as.length+'">\
+            <span class="lead">'
+                + id +
+            '</span>\
+            <button class="btn btn-danger scriptDeactivate pull-right"><span class="glyphicon glyphicon-minus"></span></button>\
+            <button class="btn btn-link scriptOptions pull-right"><span class="glyphicon glyphicon-cog"></span></button>\
+        </li>';
+        $("#activated").append(html);
+    });
+    $("#optionsSave").click(function() {
+        var inps = $("#optionsBody").find("input");
+        var pars = {};
+        inps.each(function() {
+            pars[$(this).data("name")] = $(this).val();
         });
-
+        socket.emit("ScriptSetParameters", pars);
+        console.log(pars);
     });
     socket.on('ScriptAdded', function(data) {
-        var html = '<li class="ui-state-default list-group-item clearfix" data-id="' + data.id + '">\
+        var html = '<li class="list-group-item clearfix" data-id="'+data.id+'">\
+         <button class="btn btn-success scriptActivate pull-right" data-id="'+data.id+'"><span class="glyphicon glyphicon-plus"></span></button>\
             <span class="lead">'
-                + data.name +
+                + data.id +
             '</span>\
-            <span class="pull-right">\
-                <label for="' + data.id + '">\
-                    <span class="glyphicon glyphicon-ok"></span>\
-                </label>\
-                <input type="checkbox" class="scriptActive" name="' + data.id + '" id="' + data.id + '">\
-            </span>\
         </li>';
         $('#scripts').append(html);
-        $("input").checkboxradio({
-            icon: false
-        });
-        $(".sortable").sortable();
-        $(".sortable").disableSelection();
     });
-    socket.on('ScriptChanged', function(data) {
-        $('#scripts li').each(function() {
-            if($(this).data('id') == data.id) {
-                console.log(data.name);
-                $(this).find('.lead').html(data.name);
-                $(this).effect("highlight", 4000);
-            }
-        });
+    socket.on('UtilLog', function(data) {
+        console.log(data.str);
     });
+    // socket.on('ScriptChanged', function(data) {
+    //     $('#scripts li').each(function() {
+    //         if($(this).data('id') == data.id) {
+    //             console.log(data.name);
+    //             $(this).find('.lead').html(data.name);
+    //             $(this).effect("highlight", 4000);
+    //         }
+    //     });
+    // });
     socket.on('ScriptRemoved', function(data) {
-        $("[data-id='"+data.id+"']").remove();
+        $("#scripts li[data-id='"+data.id+"']").remove();
         //$('#scripts').remove("[data-id='"+data.id+"']");
     });
     socket.on('disconnect', function(data) {
         console.log('disconnected');
-        $('#scripts').sortable({disabled: true});
-        $('.scriptActive').prop('disabled', true);
+        $('#activated').sortable({disabled: true});
+        $('.scriptActivate').prop('disabled', true);
     });
     $(function() {
-        $("input").checkboxradio({
-            icon: false
-        });
         $(".sortable").sortable();
         $(".sortable").disableSelection();
     });

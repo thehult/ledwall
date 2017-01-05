@@ -8,12 +8,15 @@
     <link rel="stylesheet" href="/css/jquery-ui.min.css" >
     <link rel="stylesheet" href="/css/jquery-ui.theme.min.css" >
     <link rel="stylesheet" href="/css/layout.css" >
+    <link rel="stylesheet" href="/css/codemirror.css" >
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/jquery-ui.min.js"></script>
     <script src='/socket.io/socket.io.js'></script>
+    <script src='/js/codemirror.js'></script>
+    <script src='/js/javascript.js'></script>
     <script>
-    
+
 
     var socket = io();
     </script>
@@ -27,6 +30,9 @@
             $("#alert-danger").hide();
             socket.on('disconnect', function(data) {
                 $("#alert-danger").show();
+            });
+            socket.on('connect', function(data) {
+                $("#alert-danger").hide();
             });
         </script>
         {{{body}}}

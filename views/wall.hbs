@@ -1,0 +1,51 @@
+<canvas id="wall" style="border: 1px solid #000000; margin: 5px;">
+
+</canvas>
+
+
+<script>
+    var canvas = document.getElementById("wall");
+    var ctx = canvas.getContext("2d");
+    var ledMargin = 3;
+    var scale = 4;
+    ctx.scale(scale, scale);
+    var wallWidth;
+    var wallHeight;
+
+    socket.on('ImageConfig', function(data) {
+        console.log(data);
+        wallWidth = data.width;
+        wallHeight = data.height;
+        canvas.width = scale * (data.width * ledMargin + ledMargin);
+        canvas.height = scale * (data.height * ledMargin + ledMargin);
+        ctx.fillStyle="black";
+        ctx.scale(scale, scale);
+        for(var i = 0; i < data.boards.length; i++) {
+            ctx.fillRect(
+                data.boards[i][0] * ledMargin,
+                data.boards[i][1] * ledMargin,
+                data.boards[i][2] * ledMargin + ledMargin,
+                data.boards[i][3] * ledMargin + ledMargin
+            );
+        }
+    });
+
+    socket.on('ImageData', function(data) {
+        for(var y = 0; y < wallHeight; y++) {
+            for(var x = 0; x < wallWidth; x++) {
+                var i = 4*(y*wallWidth + x);
+                ctx.fillStyle = "rgba("+data.data[i]+","+data.data[i+1]+","+data.data[i+2]+","+(data.data[i+3]/255)+")";
+                ctx.fillRect( x*ledMargin+ledMargin-1, y*ledMargin+ledMargin-1, 1, 1 );
+            }
+        }
+    });
+
+    socket.on('UtilLog', function(data) {
+        console.log(data.str);
+    });
+
+    socket.on('connect', function() {
+        socket.emit('ImageGetConfig');
+    });
+
+</script>
