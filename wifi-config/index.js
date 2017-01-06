@@ -212,6 +212,7 @@ module.exports = function(opts, cb) {
         if(typeof status === 'undefined')
             return callback("No such interface.");
         if(typeof status.ipv4_address !== 'string') {
+            console.log("No ipv4: " + status.ipv4_address);
             startAccessPoint();
         }
     });
