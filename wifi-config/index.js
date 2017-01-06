@@ -176,7 +176,7 @@ module.exports = function(opts, cb) {
             passphrase: pass,
             driver: 'wext'
         };
-        con_sid = ssid;
+        con_ssid = ssid;
         con_psk = pass;
         series([
             _hostapd_disable,
