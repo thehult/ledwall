@@ -1,6 +1,7 @@
 var ifconfig = require('wireless-tools/ifconfig');
 var hostapd = require('wireless-tools/hostapd');
 var udhcpd = require('wireless-tools/udhcpd');
+var udhcpc = require('wireless-tools/udhcpc');
 var iwlist = require('wireless-tools/iwlist');
 var wpa_supplicant = require('wireless-tools/wpa_supplicant');
 
@@ -80,7 +81,7 @@ module.exports = function(opts, cb) {
 
     function _ifconfig_up(cb) {
         options.iface.interface = options.interface;
-        ifconfig.up(options.iface, function(err) {
+        ifconfig.up({options.iface}, function(err) {
             if(err) return cb(err);
             _log(options.interface + " up");
             cb(null);
@@ -121,6 +122,14 @@ module.exports = function(opts, cb) {
         });
     }
 
+    function _udhcpc_enable(cb) {
+        udhcpc.enable({interface: options.interface}, function(err) {
+            if(err) return cb(err);
+            _log("udhcpc enabled");
+            cb(null);
+        });
+    }
+
 
     function startAccessPoint() {
         _log("Starting Access Point");
@@ -153,7 +162,7 @@ module.exports = function(opts, cb) {
             _hostapd_disable,
             _udhcpd_disable,
             _ifconfig_down,
-            _ifconfig_up,
+            _udhcpc_enable,
             _ifconfig_wait_for_up,
         ], function(err, results) {
             if(err) return callback(err);
