@@ -10,7 +10,7 @@ var options = {
         channel: 6,
         driver: 'nl80211',
         hw_mode: 'g',
-        ssid: 'SIOS Fjorgyn',
+        ssid: 'LedWall',
         wpa: 2,
         wpa_passphrase: '123qweasd'
     },
