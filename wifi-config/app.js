@@ -26,7 +26,7 @@ app.get('/connect/:index', function(req, res) {
         app.connectCallback(networks[req.params.index], req.query.password, function(err) {
             if(err)
                 res.render('home', {networks: networks});
-            res.render('connecting');
+            //res.render('connecting');
         });
         res.render('connecting', {
             network: networks[req.params.index]

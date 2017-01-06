@@ -149,7 +149,16 @@ module.exports = function(opts, cb) {
             passphrase: pass,
             driver: 'wext'
         };
-        wpa_supplicant.enable(opts, callback);
+        series([
+            _hostapd_disable,
+            _udhcpd_disable,
+            _ifconfig_down,
+            _ifconfig_up,
+            _ifconfig_wait_for_up,
+        ], function(err, results) {
+            if(err) return callback(err);
+            wpa_supplicant.enable(opts, callback);
+        });
     }
 
     function accessPoint_started() {
