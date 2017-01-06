@@ -187,6 +187,17 @@ server.listen(cfg.port, function() {
     console.log('Server started on port ' + cfg.port);
 });
 
+var SPI = require('pi-spi');
+app.spi = SPI.initialize("/dev/spidev0.0")
+
+var Buffer = require('buffer');
+app.boardsBuffer = Buffer.alloc(768 * wall.config.boards.length);
+app.gpio = require('rpi-gpio');
+
+app.gpio.setup(15, gpio.DIR_OUT, function(err) {
+    if(err) console.log("GPIO SETUP FAILED!");
+});
+
 app.tickTimer = setInterval(function() {
     wall.tick();
     try {
@@ -195,6 +206,28 @@ app.tickTimer = setInterval(function() {
         io.emit("UtilLog", {str: e.toString()});
     }
     var imgData = wall.ctx.getImageData(0, 0, wall.width, wall.height);
+    var p = 0;
+    for(var i = wall.config.boards.length - 1; i >= 0; i--) {
+        for(var y = wall.config.boards[i][1]; y < wall.config.boards[i][3]; y++) {
+            for(var x = wall.config.boards[i][0]; x < wall.config.boards[i][2]; x++) {
+                var i = 4*(y*wall.width + x);
+                p = buf.writeInt8(imgData[i], p);
+                p = buf.writeInt8(imgData[i+1], p);
+                p = buf.writeInt8(imgData[i+2], p);
+            }
+        }
+    }
+    app.gpio.write(15, false, function(err) {
+        if(err) return console.log("FAILED LOWERING SS-PIN!");
+        app.spi.write(buf, function(err) {
+            if(err) return console.log("FAILED WRITING BUFFER!");
+            app.gpio.write(15, true, function(err) {
+                if(err) return console.log("FAILED RAISING SS-PIN!");
+                console.log("SENT VIA SPI SUCCESSFULLY ------------------");
+            });
+        });
+
+    });
     io.emit("ImageData", {data: imgData.data, length: imgData.data.length });
 }, 1000.0 / cfg.updatesPerSecond);
 
