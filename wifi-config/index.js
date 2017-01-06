@@ -170,6 +170,7 @@ module.exports = function(opts, cb) {
     };
 
     function connectToWifi(ssid, pass, callback) {
+        console.log("SSID: " + ssid + ", pass: " + pass);
         var opts = {
             interface: options.interface,
             ssid: ssid,
