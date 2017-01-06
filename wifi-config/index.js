@@ -10,6 +10,7 @@ var until = require('async/until');
 
 var http = require('http');
 
+var fs = require('fs');
 
 module.exports = function(opts, cb) {
     var wifiNetworks = [];
@@ -147,7 +148,6 @@ module.exports = function(opts, cb) {
             _udhcpd_disable,
             _ifconfig_down,
             _ifconfig_up,
-            _ifconfig_wait_for_up,
             _iwlist_scan,
             _udhcpd_enable,
             _hostapd_enable
@@ -159,6 +159,16 @@ module.exports = function(opts, cb) {
 
     }
 
+    var con_ssid;
+    var con_psk;
+    function _connectWifi(cb) {
+        var cont = fs.readFileSync("/etc/wpa_supplicant/wpa_supplicant.conf", {encoding: "utf8"});
+        cont = cont.replace(/network={(.|\n|\r)*}/gm, "");
+        cont += "\r\nnetwork={\r\n\tssid=\"" + con_ssid + "\"\r\n\tpsk=\"" + con_psk + "\"\r\n}";
+        fs.writeFileSync("/etc/wpa_supplicant/wpa_supplicant.conf", cont);
+        cb(null);
+    };
+
     function connectToWifi(ssid, pass, callback) {
         var opts = {
             interface: options.interface,
@@ -166,16 +176,18 @@ module.exports = function(opts, cb) {
             passphrase: pass,
             driver: 'wext'
         };
+        con_sid = ssid;
+        con_psk = pass;
         series([
             _hostapd_disable,
             _udhcpd_disable,
             _ifconfig_down,
+            _connectWifi,
             _ifconfig_up_dynamic,
             _ifconfig_wait_for_up,
-            _udhcpc_enable,
         ], function(err, results) {
             if(err) return callback(err);
-            wpa_supplicant.enable(opts, callback);
+            //wpa_supplicant.enable(opts, callback);c
         });
     }
 
