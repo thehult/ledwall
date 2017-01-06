@@ -88,6 +88,14 @@ module.exports = function(opts, cb) {
         });
     }
 
+    function _ifconfig_up_dynamic(cb) {
+        ifconfig.exec('ifconfig ' + options.interface + ' 0.0.0.0 0.0.0.0', function(err) {
+            if(err) return cb(err);
+            _log(options.interface + " up");
+            cb(null);
+        });
+    }
+
     function _udhcpd_disable(cb) {
         udhcpd.disable(options.interface, function(err) {
             if(err) return cb(err);
@@ -162,8 +170,9 @@ module.exports = function(opts, cb) {
             _hostapd_disable,
             _udhcpd_disable,
             _ifconfig_down,
-            _udhcpc_enable,
+            _ifconfig_up_dynamic,
             _ifconfig_wait_for_up,
+            _udhcpc_enable,
         ], function(err, results) {
             if(err) return callback(err);
             wpa_supplicant.enable(opts, callback);
