@@ -1,4 +1,4 @@
-var update = require("./updater.js");
+
 
 
 var wifi = require('./wifi-config');
@@ -33,15 +33,16 @@ var options = {
     }
 };
 
+
 wifi(options, function(err) {
     if(err) return console.log(err);
     console.log("We have wifi!");
+    var update = require("./updater.js");
+
+    var timer = setInterval(function() {
+        if(update.finished) {
+            clearInterval(timer);
+            var app = require("./server.js");
+        }
+    }, 250);
 });
-
-
-var timer = setInterval(function() {
-    if(update.finished) {
-        clearInterval(timer);
-        var app = require("./server.js");
-    }
-}, 250);
