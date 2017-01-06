@@ -183,8 +183,7 @@ module.exports = function(opts, cb) {
             _udhcpd_disable,
             _ifconfig_down,
             _connectWifi,
-            _ifconfig_up_dynamic,
-            _ifconfig_wait_for_up,
+            _ifconfig_up_dynamic
         ], function(err, results) {
             if(err) return callback(err);
             //wpa_supplicant.enable(opts, callback);c
