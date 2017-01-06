@@ -24,8 +24,8 @@ app.get('/connect/:index', function(req, res) {
         });
     } else {
         app.connectCallback(networks[req.params.index], req.query.password, function(err) {
-            //if(err)
-            //    res.render('home', {networks: networks});
+            if(err)
+                return console.log(err);
             //res.render('connecting');
             console.log("Connected!");
         });

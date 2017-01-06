@@ -81,7 +81,7 @@ module.exports = function(opts, cb) {
 
     function _ifconfig_up(cb) {
         options.iface.interface = options.interface;
-        ifconfig.up({options.iface}, function(err) {
+        ifconfig.up(options.iface, function(err) {
             if(err) return cb(err);
             _log(options.interface + " up");
             cb(null);
