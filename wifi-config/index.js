@@ -166,7 +166,11 @@ module.exports = function(opts, cb) {
         cont = cont.replace(/network={(.|\n|\r)*}/gm, "");
         cont += "\r\nnetwork={\r\n\tssid=\"" + con_ssid + "\"\r\n\tpsk=\"" + con_psk + "\"\r\n}";
         fs.writeFileSync("/etc/wpa_supplicant/wpa_supplicant.conf", cont);
-        cb(null);
+        ifconfig.exec('reboot', function(err) {
+            if(err) return cb(err);
+            _log("Rebooting");
+            cb(null);
+        });
     };
 
     function connectToWifi(ssid, pass, callback) {
@@ -214,6 +218,8 @@ module.exports = function(opts, cb) {
         if(typeof status.ipv4_address !== 'string') {
             console.log("No ipv4: " + status.ipv4_address);
             startAccessPoint();
+        } else {
+            callback(null);
         }
     });
 };
