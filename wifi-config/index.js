@@ -207,7 +207,7 @@ module.exports = function(opts, cb) {
     var logging = opts.logging || false;
     console.log(logging);
     _log("Checking " + opts.interface + " status");
-    ifconfig.status(function(err, status) {
+    ifconfig.status(opts.interface, function(err, status) {
         if(err) return callback("Could not call ifconfig.");
         if(typeof status === 'undefined')
             return callback("No such interface.");
