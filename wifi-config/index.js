@@ -186,6 +186,7 @@ module.exports = function(opts, cb) {
             _ifconfig_up_dynamic
         ], function(err, results) {
             if(err) return callback(err);
+            callback(null);
             //wpa_supplicant.enable(opts, callback);c
         });
     }

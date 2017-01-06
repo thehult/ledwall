@@ -23,7 +23,7 @@ app.get('/connect/:index', function(req, res) {
             index: req.params.index
         });
     } else {
-        app.connectCallback(networks[req.params.index], req.query.password, function(err) {
+        app.connectCallback(networks[req.params.index].ssid, req.query.password, function(err) {
             if(err)
                 return console.log(err);
             //res.render('connecting');
