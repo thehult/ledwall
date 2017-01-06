@@ -2,7 +2,7 @@ var app = require('express')();
 var exphbs = require('express-handlebars');
 var querystring = require('querystring');
 
-var networks = {};
+app.networks = {};
 
 app.engine('handlebars', exphbs({
     defaultLayout: 'main',
@@ -12,25 +12,27 @@ app.set('view engine', 'handlebars');
 app.set('views', __dirname + '/views');
 
 app.get('/', function(req, res) {
-    res.render('home', {networks: networks});
+    res.render('home', {networks: app.networks});
 });
 
 app.get('/connect/:index', function(req, res) {
     console.log("BAJS:" + req.params.index);
     if(typeof req.query.password === 'undefined') {
         res.render('connect', {
-            network: networks[req.params.index],
+            network: app.networks[req.params.index],
             index: req.params.index
         });
     } else {
-        app.connectCallback(networks[req.params.index].ssid, req.query.password, function(err) {
+        console.log(app.networks);
+        console.log(req.params.index);
+        app.connectCallback(app.networks[req.params.index], req.query.password, function(err) {
             if(err)
                 return console.log(err);
             //res.render('connecting');
             console.log("Connected!");
         });
         res.render('connecting', {
-            network: networks[req.params.index]
+            network: app.networks[req.params.index]
         });
     }
 });
@@ -42,7 +44,7 @@ module.exports = {
         app.connectCallback = _connectCallback;
         for(var i = 0; i < _networks.length; i++) {
             var net = _networks[i];
-            networks[net.address] = net.ssid;
+            app.networks[net.address] = net.ssid;
             //networks.push(net.ssid);
         }
         app.listen(port, hostname, function() {
